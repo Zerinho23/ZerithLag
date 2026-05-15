@@ -31,20 +31,25 @@ public class ClearTask extends BukkitRunnable {
         timeLeft--;
         ConfigManager cfg = plugin.getConfigManager();
 
-        if (cfg.getCountdown().contains(timeLeft)) {
-            String raw = cfg.getCountdownMessage().replace("{time}", String.valueOf(timeLeft));
+        // ── Action bar / chat countdown (existing system) ────────────────────
+        if (cfg.shouldBroadcast() && cfg.getCountdown().contains(timeLeft)) {
+            String raw  = cfg.getCountdownMessage().replace("{time}", String.valueOf(timeLeft));
             Component bar  = cfg.component(raw);
             Component chat = cfg.getPrefix().append(bar);
 
-            if (cfg.shouldBroadcast()) {
-                if (cfg.useActionBar()) {
-                    Bukkit.getOnlinePlayers().forEach(p -> p.sendActionBar(bar));
-                } else {
-                    Bukkit.broadcast(chat);
-                }
+            if (cfg.useActionBar()) {
+                Bukkit.getOnlinePlayers().forEach(p -> p.sendActionBar(bar));
+            } else {
+                Bukkit.broadcast(chat);
             }
         }
 
+        // ── Chat alerts (always in chat, independent of action bar) ──────────
+        if (cfg.isChatAlertsEnabled()) {
+            sendChatAlert(cfg, timeLeft);
+        }
+
+        // ── Execute clear ────────────────────────────────────────────────────
         if (timeLeft <= 0) {
             int cleared = clearEntities();
             plugin.getStatsManager().recordClear(cleared);
@@ -56,6 +61,34 @@ public class ClearTask extends BukkitRunnable {
             }
 
             timeLeft = cfg.getClearInterval();
+        }
+    }
+
+    /**
+     * Sends the appropriate chat alert based on how many seconds remain.
+     *
+     * Priority:
+     *  1. timeLeft == 60         → minute-message  (always "1 minuto")
+     *  2. timeLeft in second-alerts (e.g. 30) → seconds-message with {time}
+     *  3. 1 ≤ timeLeft ≤ countdown-from       → countdown-message with {time}
+     */
+    private void sendChatAlert(ConfigManager cfg, int time) {
+        Component msg = null;
+
+        if (time == 60) {
+            msg = cfg.component(cfg.getChatMinuteMessage());
+
+        } else if (cfg.getChatSecondAlerts().contains(time)) {
+            msg = cfg.component(
+                    cfg.getChatSecondsMessage().replace("{time}", String.valueOf(time)));
+
+        } else if (time >= 1 && time <= cfg.getChatCountdownFrom()) {
+            msg = cfg.component(
+                    cfg.getChatCountdownMessage().replace("{time}", String.valueOf(time)));
+        }
+
+        if (msg != null) {
+            Bukkit.broadcast(msg);
         }
     }
 
@@ -89,31 +122,23 @@ public class ClearTask extends BukkitRunnable {
                                   boolean keepNamed, boolean keepTamed) {
         if (entity instanceof Player) return false;
 
-        // entity.customName() is the Adventure API method (non-deprecated in 1.20+)
         if (keepNamed && entity.customName() != null) return false;
 
         if (keepTamed && entity instanceof Tameable t && t.isTamed()) return false;
 
-        // ── Custom list mode ─────────────────────────────────────────────────
         if (!custom.isEmpty()) {
             return custom.contains(entity.getType());
         }
 
-        // ── Default smart removal ─────────────────────────────────────────────
         if (entity instanceof Item)           return true;
         if (entity instanceof ExperienceOrb)  return true;
-        // All arrow types (Arrow, SpectralArrow, TippedArrow)
         if (entity instanceof AbstractArrow)  return true;
-        // All fireball types + WindCharge (1.21) all extend Fireball
         if (entity instanceof Fireball)       return true;
         if (entity instanceof TNTPrimed)      return true;
         if (entity instanceof FallingBlock)   return true;
-        // All hostile mobs including Bogged, Breeze (1.21) which extend Monster
         if (entity instanceof Monster)        return true;
-        // Boats (Boat + ChestBoat since 1.19) with no passengers
         if (entity instanceof Boat && entity.getPassengers().isEmpty())     return true;
         if (entity instanceof Minecart && entity.getPassengers().isEmpty()) return true;
-        // Thrown projectiles (snowballs, eggs, potions, ender pearls, tridents in flight)
         if (entity instanceof Projectile
                 && !(entity instanceof AbstractArrow)
                 && !(entity instanceof Fireball)) return true;
