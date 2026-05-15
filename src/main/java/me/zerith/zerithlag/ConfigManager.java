@@ -140,6 +140,57 @@ public class ConfigManager {
         return plugin.getConfig().getBoolean("entity-types.keep-tamed", true);
     }
 
+    // ── TPS-triggered clear ───────────────────────────────────────────────────
+
+    public boolean isTpsClearEnabled() {
+        return plugin.getConfig().getBoolean("tps-clear.enabled", true);
+    }
+
+    public double getTpsClearThreshold() {
+        return plugin.getConfig().getDouble("tps-clear.threshold", 15.0);
+    }
+
+    public int getTpsClearCooldown() {
+        return Math.max(10, plugin.getConfig().getInt("tps-clear.cooldown", 60));
+    }
+
+    public String getTpsClearMessage() {
+        return plugin.getConfig().getString("tps-clear.message",
+                "&cTPS bajo &7(&c{tps}&7) &c— limpiando &e{amount} &centidades de emergencia.");
+    }
+
+    // ── Mob stacker ───────────────────────────────────────────────────────────
+
+    public boolean isMobStackerEnabled() {
+        return plugin.getConfig().getBoolean("mob-stacker.enabled", true);
+    }
+
+    public double getMobStackerRadius() {
+        return plugin.getConfig().getDouble("mob-stacker.radius", 5.0);
+    }
+
+    public boolean isMobStackerAutoEnabled() {
+        return plugin.getConfig().getBoolean("mob-stacker.auto", false);
+    }
+
+    public String getMobStackerNameFormat() {
+        return plugin.getConfig().getString("mob-stacker.name-format",
+                "&7[&e\u00d7{count}&7] &f{type}");
+    }
+
+    public List<EntityType> getMobStackerTypes() {
+        List<String>     names = plugin.getConfig().getStringList("mob-stacker.types");
+        List<EntityType> types = new ArrayList<>();
+        for (String name : names) {
+            try {
+                types.add(EntityType.valueOf(name.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("Tipo desconocido en mob-stacker.types: " + name);
+            }
+        }
+        return types;
+    }
+
     // ── Messages ─────────────────────────────────────────────────────────────
 
     public String getMsgReload() {
@@ -155,6 +206,11 @@ public class ConfigManager {
     public String getMsgNoPermission() {
         return plugin.getConfig().getString("messages.no-permission",
                 "&cNo tienes permiso para usar este comando.");
+    }
+
+    public String getMsgStackCommand() {
+        return plugin.getConfig().getString("messages.stack-command",
+                "&aApilados &e{merged} &amobs en &e{stacks} &agrupos.");
     }
 
     public String getMsgInfo() {
