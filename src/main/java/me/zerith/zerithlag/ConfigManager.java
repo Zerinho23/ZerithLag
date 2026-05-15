@@ -24,6 +24,10 @@ public class ConfigManager {
     private static final Pattern HEX_PATTERN =
             Pattern.compile("&#([A-Fa-f0-9]{6})");
 
+    // Matches time components in strings like "1h30m20s"
+    private static final Pattern TIME_PATTERN =
+            Pattern.compile("(?:(\\d+)h)?(?:(\\d+)m)?(?:(\\d+)s)?");
+
     // Legacy-section serializer with hex-color support (§x§R§R§G§G§B§B format)
     private static final LegacyComponentSerializer SECTION_HEX =
             LegacyComponentSerializer.legacySection().toBuilder()
@@ -55,7 +59,13 @@ public class ConfigManager {
     }
 
     public int getClearInterval() {
-        return Math.max(10, plugin.getConfig().getInt("auto-clear.interval", 300));
+        String raw = plugin.getConfig().getString("auto-clear.interval", "5m");
+        int seconds = parseTime(raw, 300);
+        if (seconds < 10) {
+            plugin.getLogger().warning("auto-clear.interval es muy bajo (" + raw
+                    + "). Usando mínimo de 10 segundos.");
+        }
+        return Math.max(10, seconds);
     }
 
     public List<Integer> getCountdown() {
@@ -151,7 +161,8 @@ public class ConfigManager {
     }
 
     public int getTpsClearCooldown() {
-        return Math.max(10, plugin.getConfig().getInt("tps-clear.cooldown", 60));
+        String raw = plugin.getConfig().getString("tps-clear.cooldown", "1m");
+        return Math.max(10, parseTime(raw, 60));
     }
 
     public String getTpsClearMessage() {
@@ -216,6 +227,45 @@ public class ConfigManager {
     public String getMsgInfo() {
         return plugin.getConfig().getString("messages.info",
                 "&6ZerithLag &fv{version} &7por &e{author} &8| &7Total eliminadas: &e{total}");
+    }
+
+    // ── Time parsing ──────────────────────────────────────────────────────────
+
+    /**
+     * Parses a human-readable time string into total seconds.
+     *
+     * Supported formats (case-insensitive, combinable):
+     *   "5m"       →  300
+     *   "10m"      →  600
+     *   "30s"      →   30
+     *   "1h"       → 3600
+     *   "1h30m"    → 5400
+     *   "1h30m20s" → 5420
+     *   "300"      →  300  (plain integer = seconds, backwards-compatible)
+     *
+     * Returns {@code defaultValue} if the string is null, blank, or produces 0.
+     */
+    public static int parseTime(String raw, int defaultValue) {
+        if (raw == null || raw.isBlank()) return defaultValue;
+        raw = raw.trim().toLowerCase();
+
+        // Plain integer → treat as seconds (backwards-compatible)
+        if (raw.matches("\\d+")) {
+            int v = Integer.parseInt(raw);
+            return v > 0 ? v : defaultValue;
+        }
+
+        // Named time string: [Xh][Xm][Xs]
+        Matcher m = TIME_PATTERN.matcher(raw);
+        if (m.find()) {
+            int h   = m.group(1) != null ? Integer.parseInt(m.group(1)) : 0;
+            int min = m.group(2) != null ? Integer.parseInt(m.group(2)) : 0;
+            int sec = m.group(3) != null ? Integer.parseInt(m.group(3)) : 0;
+            int total = h * 3600 + min * 60 + sec;
+            if (total > 0) return total;
+        }
+
+        return defaultValue;
     }
 
     // ── Color parsing ─────────────────────────────────────────────────────────
