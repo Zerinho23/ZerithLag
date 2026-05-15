@@ -177,6 +177,10 @@
 
   ## 📋 Changelog
 
+  ### v1.1.1
+  - ✨ Nuevo: Formato de tiempo legible en config (`5m`, `1h`, `30s`, `1h30m`, etc.) para `interval` y `cooldown`
+  - ✅ Compatibilidad hacia atrás: números enteros (segundos) siguen funcionando
+
   ### v1.1.0
   - ✨ Nuevo: Guardia de TPS — limpieza automática de emergencia por TPS bajo
   - ✨ Nuevo: Mob Stacker — apila mobs idénticos cercanos (`/zerith stack`)
