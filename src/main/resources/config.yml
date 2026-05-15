@@ -34,21 +34,50 @@ auto-clear:
   worlds:
     - all
 
-  # En qué segundos avisar antes de la limpieza
+  # En qué segundos mostrar el mensaje de la barra de acción
   countdown:
     - 60
     - 30
     - 10
     - 5
+    - 4
     - 3
     - 2
     - 1
 
-  # Mensaje de cuenta regresiva. {time} = segundos restantes
+  # Mensaje de la barra de acción. {time} = segundos restantes
   countdown-message: "&eLimpiando entidades en &c{time}s&e..."
 
   # Mensaje al terminar la limpieza. {amount} = entidades eliminadas
   clear-message: "&aEliminadas &e{amount} &aentidades del mundo."
+
+# ── Alertas en el chat ─────────────────────────────
+# Estos mensajes siempre se envían al chat, independientemente
+# de si "use-action-bar" está activo o no.
+
+chat-alerts:
+
+  # ¿Activar las alertas en el chat?
+  enabled: true
+
+  # Mensaje cuando falta exactamente 1 minuto (60 segundos)
+  minute-message: "&8[&6ZerithLag&8] &r&7La limpieza de entidades ocurrirá en &61 minuto&7."
+
+  # Mensaje cuando faltan X segundos (configurado en 'second-alerts')
+  # {time} = segundos restantes
+  seconds-message: "&8[&6ZerithLag&8] &r&7La limpieza de entidades ocurrirá en &e{time} segundos&7."
+
+  # Segundos en los que se enviará el 'seconds-message' al chat
+  # (no incluir 60 aquí, ese usa 'minute-message')
+  second-alerts:
+    - 30
+
+  # Mensaje de cuenta regresiva final en el chat
+  # {time} = segundos restantes
+  countdown-message: "&8[&6ZerithLag&8] &r&cLimpiando en &l{time}&c..."
+
+  # Desde cuántos segundos antes iniciar la cuenta regresiva final en el chat
+  countdown-from: 5
 
 # ── Tipos de entidades ─────────────────────────────
 
@@ -64,20 +93,14 @@ entity-types:
   # Si la lista está vacía, ZerithLag elimina automáticamente:
   #   ITEM, EXPERIENCE_ORB, ARROW, SPECTRAL_ARROW, TNT, FALLING_BLOCK, todos los MONSTER,
   #   BOAT y MINECART sin pasajeros.
-  # Si quieres personalizar, descomenta y edita:
   remove: []
   # Ejemplos:
   #  - ITEM
   #  - EXPERIENCE_ORB
   #  - ARROW
-  #  - SPECTRAL_ARROW
-  #  - TNT
-  #  - FALLING_BLOCK
   #  - ZOMBIE
   #  - SKELETON
   #  - CREEPER
-  #  - SPIDER
-  #  - SLIME
 
 # ── Mensajes ───────────────────────────────────────
 
