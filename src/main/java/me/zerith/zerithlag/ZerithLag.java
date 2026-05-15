@@ -7,21 +7,22 @@ public class ZerithLag extends JavaPlugin {
     public static final String AUTHOR = "zerinho23";
 
     // ── ANSI color codes for the server console ───────────────────────────────
-    // Paper's console (jline) supports 24-bit true-color ANSI escape sequences.
-    private static final String ANSI_RESET   = "\u001B[0m";
-    private static final String ANSI_GOLD    = "\u001B[38;2;255;170;0m";    // §6
-    private static final String ANSI_YELLOW  = "\u001B[38;2;255;255;85m";   // §e
-    private static final String ANSI_WHITE   = "\u001B[38;2;255;255;255m";  // §f
-    private static final String ANSI_GRAY    = "\u001B[38;2;170;170;170m";  // §7
-    private static final String ANSI_DGRAY   = "\u001B[38;2;85;85;85m";     // §8
-    private static final String ANSI_GREEN   = "\u001B[38;2;85;255;85m";    // §a
-    private static final String ANSI_CYAN    = "\u001B[38;2;85;255;255m";   // §b
+    private static final String ANSI_RESET  = "\u001B[0m";
+    private static final String ANSI_GOLD   = "\u001B[38;2;255;170;0m";
+    private static final String ANSI_YELLOW = "\u001B[38;2;255;255;85m";
+    private static final String ANSI_WHITE  = "\u001B[38;2;255;255;255m";
+    private static final String ANSI_GRAY   = "\u001B[38;2;170;170;170m";
+    private static final String ANSI_DGRAY  = "\u001B[38;2;85;85;85m";
+    private static final String ANSI_GREEN  = "\u001B[38;2;85;255;85m";
+    private static final String ANSI_CYAN   = "\u001B[38;2;85;255;255m";
 
     private static ZerithLag instance;
-    private ConfigManager configManager;
-    private StatsManager statsManager;
-    private TpsMonitor tpsMonitor;
-    private ClearTask clearTask;
+    private ConfigManager  configManager;
+    private StatsManager   statsManager;
+    private TpsMonitor     tpsMonitor;
+    private TpsClearTask   tpsClearTask;
+    private ClearTask      clearTask;
+    private MobStacker     mobStacker;
 
     @Override
     public void onEnable() {
@@ -34,18 +35,22 @@ public class ZerithLag extends JavaPlugin {
         tpsMonitor   = new TpsMonitor(this);
         tpsMonitor.start();
 
+        mobStacker = new MobStacker(this);
+
         ZerithCommand cmd = new ZerithCommand(this);
         getCommand("zerith").setExecutor(cmd);
         getCommand("zerith").setTabCompleter(cmd);
 
         startClearTask();
+        startTpsClearTask();
         printBanner();
     }
 
     @Override
     public void onDisable() {
-        if (clearTask  != null) clearTask.cancel();
-        if (tpsMonitor != null) tpsMonitor.cancel();
+        if (clearTask    != null) clearTask.cancel();
+        if (tpsClearTask != null) tpsClearTask.cancel();
+        if (tpsMonitor   != null) tpsMonitor.cancel();
         getLogger().info(
                 ANSI_GOLD + "ZerithLag" + ANSI_GRAY + " deshabilitado. " +
                 ANSI_GRAY + "Total eliminadas: " +
@@ -63,9 +68,21 @@ public class ZerithLag extends JavaPlugin {
         }
     }
 
+    public void startTpsClearTask() {
+        if (tpsClearTask != null) {
+            tpsClearTask.cancel();
+            tpsClearTask = null;
+        }
+        if (configManager.isTpsClearEnabled()) {
+            tpsClearTask = new TpsClearTask(this);
+            tpsClearTask.start();
+        }
+    }
+
     public void reload() {
         configManager.loadConfig();
         startClearTask();
+        startTpsClearTask();
         getLogger().info(ANSI_GREEN + "Configuración recargada correctamente." + ANSI_RESET);
     }
 
@@ -105,8 +122,9 @@ public class ZerithLag extends JavaPlugin {
         getLogger().info("");
     }
 
-    public static ZerithLag getInstance()      { return instance; }
-    public ConfigManager   getConfigManager()  { return configManager; }
-    public StatsManager    getStatsManager()   { return statsManager; }
-    public TpsMonitor      getTpsMonitor()     { return tpsMonitor; }
+    public static ZerithLag getInstance()     { return instance; }
+    public ConfigManager  getConfigManager()  { return configManager; }
+    public StatsManager   getStatsManager()   { return statsManager; }
+    public TpsMonitor     getTpsMonitor()     { return tpsMonitor; }
+    public MobStacker     getMobStacker()     { return mobStacker; }
 }
