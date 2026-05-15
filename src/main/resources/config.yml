@@ -1,0 +1,88 @@
+# =====================================================
+#               ZerithLag Configuration
+#          Plugin antilag by zerinho23
+# =====================================================
+# Colores: usa & seguido de un código:
+#   &0 Negro   &1 Azul oscuro  &2 Verde oscuro  &3 Cian oscuro
+#   &4 Rojo    &5 Morado       &6 Naranja/Oro   &7 Gris
+#   &8 Gris    &9 Azul         &a Verde          &b Cian
+#   &c Rojo    &d Rosa         &e Amarillo       &f Blanco
+#   &l Negrita &o Cursiva      &n Subrayado      &m Tachado
+# =====================================================
+
+# Prefijo que aparece antes de cada mensaje del plugin
+prefix: "&8[&6ZerithLag&8] &r"
+
+# ── Limpieza automática ────────────────────────────
+
+auto-clear:
+
+  # ¿Activar la limpieza automática?
+  enabled: true
+
+  # Segundos entre cada limpieza automática (mínimo 10)
+  interval: 300
+
+  # ¿Enviar mensajes a todos los jugadores?
+  broadcast: true
+
+  # true  = los mensajes de cuenta regresiva aparecen en la barra de acción (sin spam en el chat)
+  # false = los mensajes se mandan al chat
+  use-action-bar: true
+
+  # Mundos donde se limpiará (escribir el nombre exacto del mundo, o "all" para todos)
+  worlds:
+    - all
+
+  # En qué segundos avisar antes de la limpieza
+  countdown:
+    - 60
+    - 30
+    - 10
+    - 5
+    - 3
+    - 2
+    - 1
+
+  # Mensaje de cuenta regresiva. {time} = segundos restantes
+  countdown-message: "&eLimpiando entidades en &c{time}s&e..."
+
+  # Mensaje al terminar la limpieza. {amount} = entidades eliminadas
+  clear-message: "&aEliminadas &e{amount} &aentidades del mundo."
+
+# ── Tipos de entidades ─────────────────────────────
+
+entity-types:
+
+  # ¿Conservar entidades con nombre personalizado? (mascotas nombradas, etc.)
+  keep-named: true
+
+  # ¿Conservar animales domesticados? (perros, gatos, caballos con dueño)
+  keep-tamed: true
+
+  # Lista de tipos de entidades a eliminar (vacío = usa la lista automática inteligente)
+  # Si la lista está vacía, ZerithLag elimina automáticamente:
+  #   ITEM, EXPERIENCE_ORB, ARROW, SPECTRAL_ARROW, TNT, FALLING_BLOCK, todos los MONSTER,
+  #   BOAT y MINECART sin pasajeros.
+  # Si quieres personalizar, descomenta y edita:
+  remove: []
+  # Ejemplos:
+  #  - ITEM
+  #  - EXPERIENCE_ORB
+  #  - ARROW
+  #  - SPECTRAL_ARROW
+  #  - TNT
+  #  - FALLING_BLOCK
+  #  - ZOMBIE
+  #  - SKELETON
+  #  - CREEPER
+  #  - SPIDER
+  #  - SLIME
+
+# ── Mensajes ───────────────────────────────────────
+
+messages:
+  reload: "&aConfiguración recargada correctamente."
+  clear-command: "&aEliminadas &e{amount} &aentidades manualmente."
+  no-permission: "&cNo tienes permiso para usar este comando."
+  info: "&6ZerithLag &fv{version} &7por &e{author} &8| &7Total eliminadas: &e{total}"
