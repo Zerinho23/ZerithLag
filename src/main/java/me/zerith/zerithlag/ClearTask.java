@@ -51,6 +51,11 @@ public class ClearTask extends BukkitRunnable {
 
         // ── Execute clear ────────────────────────────────────────────────────
         if (timeLeft <= 0) {
+            // Optional: stack mobs first, then clear remaining
+            if (cfg.isMobStackerAutoEnabled()) {
+                plugin.getMobStacker().stackAll();
+            }
+
             int cleared = clearEntities();
             plugin.getStatsManager().recordClear(cleared);
 
