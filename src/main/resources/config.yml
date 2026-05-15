@@ -2,15 +2,25 @@
 #               ZerithLag Configuration
 #          Plugin antilag by zerinho23
 # =====================================================
-# Colores: usa & seguido de un código:
-#   &0 Negro   &1 Azul oscuro  &2 Verde oscuro  &3 Cian oscuro
-#   &4 Rojo    &5 Morado       &6 Naranja/Oro   &7 Gris
-#   &8 Gris    &9 Azul         &a Verde          &b Cian
-#   &c Rojo    &d Rosa         &e Amarillo       &f Blanco
-#   &l Negrita &o Cursiva      &n Subrayado      &m Tachado
+#
+# COLORES — dos formatos disponibles, mezclables:
+#
+#   Códigos &:
+#     &0 Negro    &1 Azul osc.  &2 Verde osc.  &3 Cian osc.
+#     &4 Rojo     &5 Morado     &6 Dorado       &7 Gris
+#     &8 Gris osc &9 Azul       &a Verde        &b Cian
+#     &c Rojo cl. &d Rosa       &e Amarillo     &f Blanco
+#     &l Negrita  &o Cursiva    &n Subrayado    &m Tachado
+#
+#   Colores hexadecimales:
+#     &#RRGGBB   — cualquier color RGB de 24 bits
+#     Ejemplos:  &#FF6600 (naranja)  &#00AAFF (azul cielo)  &#FF0066 (rosa)
+#
+#   Se pueden mezclar: "&l&#FF6600Texto naranja en negrita&r"
+#
 # =====================================================
 
-# Prefijo que aparece antes de cada mensaje del plugin
+# Prefijo del plugin en los mensajes
 prefix: "&8[&6ZerithLag&8] &r"
 
 # ── Limpieza automática ────────────────────────────
@@ -26,15 +36,15 @@ auto-clear:
   # ¿Enviar mensajes a todos los jugadores?
   broadcast: true
 
-  # true  = los mensajes de cuenta regresiva aparecen en la barra de acción (sin spam en el chat)
-  # false = los mensajes se mandan al chat
+  # true  = mensajes de cuenta regresiva en la barra de acción (sin spam en chat)
+  # false = mensajes en el chat
   use-action-bar: true
 
-  # Mundos donde se limpiará (escribir el nombre exacto del mundo, o "all" para todos)
+  # Mundos donde se limpiará ("all" = todos, o escribe el nombre exacto del mundo)
   worlds:
     - all
 
-  # En qué segundos mostrar el mensaje de la barra de acción
+  # Segundos en los que mostrar el mensaje de la barra de acción
   countdown:
     - 60
     - 30
@@ -46,14 +56,14 @@ auto-clear:
     - 1
 
   # Mensaje de la barra de acción. {time} = segundos restantes
+  # Ejemplo con hex: "&#FF6600Limpiando en &l{time}s&#FF6600..."
   countdown-message: "&eLimpiando entidades en &c{time}s&e..."
 
   # Mensaje al terminar la limpieza. {amount} = entidades eliminadas
   clear-message: "&aEliminadas &e{amount} &aentidades del mundo."
 
 # ── Alertas en el chat ─────────────────────────────
-# Estos mensajes siempre se envían al chat, independientemente
-# de si "use-action-bar" está activo o no.
+# Siempre se mandan al chat, independientemente del action bar.
 
 chat-alerts:
 
@@ -63,36 +73,31 @@ chat-alerts:
   # Mensaje cuando falta exactamente 1 minuto (60 segundos)
   minute-message: "&8[&6ZerithLag&8] &r&7La limpieza de entidades ocurrirá en &61 minuto&7."
 
-  # Mensaje cuando faltan X segundos (configurado en 'second-alerts')
-  # {time} = segundos restantes
+  # Mensaje cuando faltan X segundos (los de 'second-alerts'). {time} = segundos.
   seconds-message: "&8[&6ZerithLag&8] &r&7La limpieza de entidades ocurrirá en &e{time} segundos&7."
 
-  # Segundos en los que se enviará el 'seconds-message' al chat
-  # (no incluir 60 aquí, ese usa 'minute-message')
+  # Segundos que activarán el 'seconds-message' (no incluir 60, eso usa minute-message)
   second-alerts:
     - 30
 
-  # Mensaje de cuenta regresiva final en el chat
-  # {time} = segundos restantes
+  # Mensaje de cuenta regresiva final. {time} = segundos.
+  # Ejemplo con hex: "&#FF4444&lLimpiando en {time}..."
   countdown-message: "&8[&6ZerithLag&8] &r&cLimpiando en &l{time}&c..."
 
-  # Desde cuántos segundos antes iniciar la cuenta regresiva final en el chat
+  # Desde cuántos segundos antes iniciar la cuenta regresiva en el chat
   countdown-from: 5
 
 # ── Tipos de entidades ─────────────────────────────
 
 entity-types:
 
-  # ¿Conservar entidades con nombre personalizado? (mascotas nombradas, etc.)
+  # ¿Conservar entidades con nombre personalizado?
   keep-named: true
 
-  # ¿Conservar animales domesticados? (perros, gatos, caballos con dueño)
+  # ¿Conservar animales domesticados?
   keep-tamed: true
 
-  # Lista de tipos de entidades a eliminar (vacío = usa la lista automática inteligente)
-  # Si la lista está vacía, ZerithLag elimina automáticamente:
-  #   ITEM, EXPERIENCE_ORB, ARROW, SPECTRAL_ARROW, TNT, FALLING_BLOCK, todos los MONSTER,
-  #   BOAT y MINECART sin pasajeros.
+  # Lista de tipos a eliminar (vacío = lista automática inteligente)
   remove: []
   # Ejemplos:
   #  - ITEM
