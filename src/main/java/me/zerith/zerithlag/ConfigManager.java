@@ -6,11 +6,30 @@ import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+/**
+ * Handles all configuration access and text color parsing.
+ *
+ * Supported color syntax in ANY config value:
+ *   &X        — legacy Minecraft color codes  (&a, &c, &l, etc.)
+ *   &#RRGGBB  — hex RGB colors                (&#FF6600, &#00AAFF, etc.)
+ *
+ * Both formats can be mixed freely: "&6ZerithLag &#FF4400v{version}"
+ */
 public class ConfigManager {
 
-    private static final LegacyComponentSerializer LEGACY =
-            LegacyComponentSerializer.legacyAmpersand();
+    // Matches &#RRGGBB hex color tags
+    private static final Pattern HEX_PATTERN =
+            Pattern.compile("&#([A-Fa-f0-9]{6})");
+
+    // Legacy-section serializer with hex-color support (§x§R§R§G§G§B§B format)
+    private static final LegacyComponentSerializer SECTION_HEX =
+            LegacyComponentSerializer.legacySection().toBuilder()
+                    .hexColors()
+                    .useUnusualXRepeatedCharacterHexFormat()
+                    .build();
 
     private final ZerithLag plugin;
 
@@ -74,31 +93,26 @@ public class ConfigManager {
         return plugin.getConfig().getBoolean("chat-alerts.enabled", true);
     }
 
-    /** Message sent when exactly 60 seconds remain. */
     public String getChatMinuteMessage() {
         return plugin.getConfig().getString("chat-alerts.minute-message",
                 "&8[&6ZerithLag&8] &r&7La limpieza de entidades ocurrirá en &61 minuto&7.");
     }
 
-    /** Message sent at the times listed in second-alerts (e.g. 30 s). {time} = seconds. */
     public String getChatSecondsMessage() {
         return plugin.getConfig().getString("chat-alerts.seconds-message",
                 "&8[&6ZerithLag&8] &r&7La limpieza de entidades ocurrirá en &e{time} segundos&7.");
     }
 
-    /** Seconds (other than 60) that trigger the seconds-message. */
     public List<Integer> getChatSecondAlerts() {
         List<Integer> list = plugin.getConfig().getIntegerList("chat-alerts.second-alerts");
         return list.isEmpty() ? List.of(30) : list;
     }
 
-    /** Countdown message used for the final N seconds. {time} = seconds. */
     public String getChatCountdownMessage() {
         return plugin.getConfig().getString("chat-alerts.countdown-message",
                 "&8[&6ZerithLag&8] &r&cLimpiando en &l{time}&c...");
     }
 
-    /** How many seconds before clearing to start the chat countdown (e.g. 5). */
     public int getChatCountdownFrom() {
         return plugin.getConfig().getInt("chat-alerts.countdown-from", 5);
     }
@@ -148,13 +162,62 @@ public class ConfigManager {
                 "&6ZerithLag &fv{version} &7por &e{author} &8| &7Total eliminadas: &e{total}");
     }
 
-    // ── Util ─────────────────────────────────────────────────────────────────
+    // ── Color parsing ─────────────────────────────────────────────────────────
 
+    /**
+     * Converts a string with &-codes and/or &#RRGGBB hex codes into an Adventure Component.
+     *
+     * Examples:
+     *   "&aHola &fmundo"           → green "Hola" + white "mundo"
+     *   "&#FF6600Texto naranja"    → true orange text
+     *   "&l&#00FFFFNegrita cyan"   → bold cyan text
+     */
     public Component component(String text) {
-        return LEGACY.deserialize(text);
+        return SECTION_HEX.deserialize(toSectionFormat(text));
     }
 
+    /**
+     * Same as {@link #component(String)} but returns a plain legacy-section String.
+     * Useful for senders that only accept raw strings (e.g. console via Logger).
+     */
     public String colorString(String text) {
-        return LegacyComponentSerializer.legacySection().serialize(LEGACY.deserialize(text));
+        return LegacyComponentSerializer.legacySection()
+                .serialize(component(text));
+    }
+
+    /**
+     * Converts mixed &-code / &#RRGGBB input into the §-section format that
+     * LegacyComponentSerializer.legacySection() understands, including the
+     * §x§R§R§G§G§B§B hex notation.
+     */
+    private static String toSectionFormat(String text) {
+        // Step 1 — &#RRGGBB  →  §x§R§R§G§G§B§B
+        Matcher hex = HEX_PATTERN.matcher(text);
+        StringBuilder sb = new StringBuilder(text.length() + 32);
+        while (hex.find()) {
+            StringBuilder rep = new StringBuilder("\u00A7x");
+            for (char c : hex.group(1).toUpperCase().toCharArray()) {
+                rep.append('\u00A7').append(c);
+            }
+            hex.appendReplacement(sb, Matcher.quoteReplacement(rep.toString()));
+        }
+        hex.appendTail(sb);
+
+        // Step 2 — &X  →  §X  (only valid color/format chars; skips & inside URLs etc.)
+        String raw = sb.toString();
+        StringBuilder out = new StringBuilder(raw.length());
+        for (int i = 0; i < raw.length(); i++) {
+            char c = raw.charAt(i);
+            if (c == '&' && i + 1 < raw.length()) {
+                char next = raw.charAt(i + 1);
+                if ("0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx".indexOf(next) >= 0) {
+                    out.append('\u00A7').append(next);
+                    i++;
+                    continue;
+                }
+            }
+            out.append(c);
+        }
+        return out.toString();
     }
 }
