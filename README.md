@@ -3,69 +3,162 @@
   # ⚡ ZerithLag
 
   **Plugin antilag para servidores de Minecraft**
+  Desarrollado por **zerinho23**
 
-  ![Version](https://img.shields.io/badge/version-1.0.0-gold?style=for-the-badge)
-  ![Minecraft](https://img.shields.io/badge/minecraft-1.20--1.21+-green?style=for-the-badge&logo=minecraft)
-  ![Java](https://img.shields.io/badge/java-17%2B-orange?style=for-the-badge&logo=openjdk)
-  ![Platform](https://img.shields.io/badge/platform-Paper%20%2F%20Spigot-blue?style=for-the-badge)
-  ![Author](https://img.shields.io/badge/autor-zerinho23-purple?style=for-the-badge)
+  [![Versión](https://img.shields.io/badge/versión-1.1.0-gold?style=for-the-badge)](https://github.com/Zerinho23/ZerithLag/releases/latest)
+  [![Paper](https://img.shields.io/badge/Paper-1.20--1.21+-blue?style=for-the-badge)](https://papermc.io)
+  [![Java](https://img.shields.io/badge/Java-17+-orange?style=for-the-badge)](https://adoptium.net)
+  [![Licencia](https://img.shields.io/badge/licencia-MIT-green?style=for-the-badge)](LICENSE)
 
   </div>
 
   ---
 
-  ## 📋 Descripción
+  ## 📖 ¿Qué es ZerithLag?
 
-  **ZerithLag** es un plugin antilag inspirado en ClearLagg, diseñado para mantener el rendimiento de tu servidor de Minecraft limpiando automáticamente entidades innecesarias como ítems en el suelo, flechas, orbes de experiencia, mobs hostiles y más.
-
-  Totalmente configurable desde el `config.yml`, con soporte de colores usando códigos `&`, mensajes en la barra de acción, estadísticas en tiempo real y monitor de TPS.
+  ZerithLag es un plugin antilag completo para servidores Paper/Spigot que reduce el lag causado por exceso de entidades mediante limpieza automática programada, limpieza de emergencia por TPS bajo y apilado inteligente de mobs.
 
   ---
 
   ## ✨ Características
 
-  - 🧹 **Limpieza automática** de entidades cada X segundos (configurable)
-  - ⏳ **Cuenta regresiva** con mensajes personalizables antes de cada limpieza
-  - 📊 **Monitor de TPS** del servidor en tiempo real
-  - 📋 **Reporte de entidades** por mundo y tipo
-  - 🌍 **Soporte multimundo** — elige qué mundos limpiar
-  - 🎨 **Colores personalizables** en todos los mensajes con códigos `&`
-  - 💬 **Action Bar** — los avisos aparecen en la barra de acción (sin spam en el chat)
-  - 🐾 **Protección de mascotas** — no elimina animales domesticados ni entidades con nombre
-  - 📈 **Estadísticas** — total de entidades eliminadas y última limpieza
-  - ✅ **Compatible** con Minecraft **1.20 → 1.21+**
+  | Característica | Descripción |
+  |---|---|
+  | 🔄 **Limpieza automática** | Elimina entidades cada X segundos (configurable) |
+  | ⚡ **Guardia de TPS** | Dispara limpieza de emergencia si el TPS cae por debajo del umbral |
+  | 📦 **Mob Stacker** | Apila mobs idénticos cercanos en uno solo, reduciendo entidades |
+  | 🎨 **Soporte HEX** | Colores `&#RRGGBB` en todos los mensajes |
+  | 📊 **Estadísticas** | Contador total de entidades eliminadas y última limpieza |
+  | 💬 **Alertas en chat** | Avisos configurables al chat independientes del action bar |
+  | 🖥️ **Banner ANSI** | Banner colorido en la consola al cargar el plugin |
 
   ---
 
   ## 📥 Instalación
 
-  1. Descarga el archivo `ZerithLag-1.0.0.jar` desde [Releases](../../releases)
-  2. Copia el JAR en la carpeta `plugins/` de tu servidor
+  1. Descarga el JAR más reciente desde [Releases](https://github.com/Zerinho23/ZerithLag/releases/latest)
+  2. Copia `ZerithLag-X.X.X.jar` en la carpeta `plugins/` de tu servidor
   3. Reinicia el servidor
-  4. Edita el `plugins/ZerithLag/config.yml` a tu gusto
-  5. Usa `/zerith reload` para aplicar los cambios sin reiniciar
+  4. Edita `plugins/ZerithLag/config.yml` a tu gusto
+  5. Usa `/zerith reload` para aplicar cambios sin reiniciar
 
-  **Requisitos:**
-  | Requisito | Versión mínima |
-  |---|---|
-  | Minecraft | 1.20 |
-  | Java | 17 |
-  | Paper / Spigot | 1.20+ |
+  **Requisitos:** Paper o Spigot **1.20 – 1.21+** · Java **17+**
 
   ---
 
-  ## 🎮 Comandos
+  ## 🧹 Limpieza automática
+
+  Limpia entidades cada cierto tiempo (300 segundos por defecto).
+
+  ```yaml
+  auto-clear:
+    enabled: true
+    interval: 300        # segundos entre limpiezas
+    broadcast: true      # avisar a los jugadores
+    use-action-bar: true # true = action bar, false = chat
+    worlds:
+      - all              # "all" o nombres de mundos específicos
+    countdown: [60, 30, 10, 5, 4, 3, 2, 1]
+    countdown-message: "&eLimpiando entidades en &c{time}s&e..."
+    clear-message: "&aEliminadas &e{amount} &aentidades del mundo."
+  ```
+
+  ---
+
+  ## ⚡ Guardia de TPS (auto-clear de emergencia)
+
+  Monitorea el TPS cada 10 segundos. Si cae por debajo del umbral, limpia entidades automáticamente.
+
+  ```yaml
+  tps-clear:
+    enabled: true
+    threshold: 15.0  # TPS mínimo antes de activarse (20.0 = ideal)
+    cooldown: 60     # segundos de espera entre limpiezas de emergencia
+    message: "&cTPS bajo &7(&c{tps}&7) &c— limpiando &e{amount} &centidades de emergencia."
+  ```
+
+  **Variables:** `{tps}` = TPS detectado · `{amount}` = entidades eliminadas
+
+  ---
+
+  ## 📦 Mob Stacker
+
+  Agrupa mobs idénticos cercanos en un solo mob con un nombre que muestra la cantidad apilada.
+
+  ```
+  [×4] Zombie   ← 4 zombies apilados en uno
+  ```
+
+  ```yaml
+  mob-stacker:
+    enabled: true
+    radius: 5.0           # bloques de radio para agrupar
+    auto: false           # true = apila antes de cada auto-clear
+    name-format: "&7[&e×{count}&7] &f{type}"
+    types: []             # vacío = todos los Monster
+    # Ejemplos: [ZOMBIE, SKELETON, CREEPER, SPIDER]
+  ```
+
+  **Variables del nombre:** `{count}` = cantidad · `{type}` = nombre del mob
+
+  ---
+
+  ## 💬 Alertas en el chat
+
+  Mensajes adicionales siempre enviados al chat (independientes del action bar).
+
+  ```yaml
+  chat-alerts:
+    enabled: true
+    minute-message: "&8[&6ZerithLag&8] &r&7La limpieza ocurrirá en &61 minuto&7."
+    seconds-message: "&8[&6ZerithLag&8] &r&7La limpieza ocurrirá en &e{time} segundos&7."
+    second-alerts: [30]   # segundos que activan el 'seconds-message'
+    countdown-message: "&8[&6ZerithLag&8] &r&cLimpiando en &l{time}&c..."
+    countdown-from: 5     # desde cuántos segundos iniciar la cuenta regresiva
+  ```
+
+  ---
+
+  ## 🛡️ Tipos de entidades
+
+  ```yaml
+  entity-types:
+    keep-named: true   # nunca eliminar mobs con nombre personalizado
+    keep-tamed: true   # nunca eliminar animales domesticados
+    remove: []         # lista personalizada (vacío = lista inteligente automática)
+  ```
+
+  **Lista automática (cuando `remove` está vacío):**
+  Items sueltos · Orbes de experiencia · Flechas · Bolas de fuego · TNT activado · Bloques cayendo · Monsters · Botes/Minecarts vacíos · Proyectiles varios
+
+  ---
+
+  ## 🎨 Colores en mensajes
+
+  Todos los mensajes de la config soportan dos formatos mezclables:
+
+  ```
+  Códigos &:    &a Verde   &c Rojo   &e Amarillo   &6 Dorado   &l Negrita
+  Hex RGB:      &#FF6600   &#00AAFF   &#FF0066
+
+  Ejemplo:  "&l&#FF6600ZerithLag &r&7v1.1.0"
+  ```
+
+  ---
+
+  ## 🖥️ Comandos
 
   | Comando | Descripción | Permiso |
   |---|---|---|
   | `/zerith` | Muestra la ayuda | `zerithlag.use` |
-  | `/zerith reload` | Recarga el config.yml | `zerithlag.reload` |
+  | `/zerith reload` | Recarga la configuración | `zerithlag.reload` |
   | `/zerith clear` | Limpia entidades manualmente | `zerithlag.clear` |
+  | `/zerith stack` | Apila mobs cercanos manualmente | `zerithlag.stack` |
   | `/zerith tps` | Muestra el TPS del servidor | `zerithlag.tps` |
-  | `/zerith entities [mundo]` | Lista entidades por tipo | `zerithlag.entities` |
-  | `/zerith info` | Info del plugin y estadísticas | `zerithlag.use` |
+  | `/zerith entities [mundo]` | Reporte de entidades por tipo | `zerithlag.entities` |
+  | `/zerith info` | Estadísticas del plugin | `zerithlag.use` |
 
-  **Aliases:** `/zl`, `/zerithlag`, `/antilag`
+  **Alias:** `/zl` · `/zerithlag` · `/antilag`
 
   ---
 
@@ -73,95 +166,39 @@
 
   | Permiso | Descripción | Por defecto |
   |---|---|---|
-  | `zerithlag.use` | Usar `/zerith` básico | OP |
-  | `zerithlag.reload` | Recargar la configuración | OP |
-  | `zerithlag.clear` | Limpiar entidades manualmente | OP |
-  | `zerithlag.tps` | Ver el TPS del servidor | OP |
+  | `zerithlag.use` | Usar /zerith e /info | OP |
+  | `zerithlag.reload` | Recargar configuración | OP |
+  | `zerithlag.clear` | Limpiar entidades | OP |
+  | `zerithlag.stack` | Apilar mobs | OP |
+  | `zerithlag.tps` | Ver TPS | OP |
   | `zerithlag.entities` | Ver reporte de entidades | OP |
 
   ---
 
-  ## ⚙️ Configuración
+  ## 📋 Changelog
 
-  El archivo `config.yml` se genera automáticamente en `plugins/ZerithLag/` al iniciar el servidor por primera vez.
+  ### v1.1.0
+  - ✨ Nuevo: Guardia de TPS — limpieza automática de emergencia por TPS bajo
+  - ✨ Nuevo: Mob Stacker — apila mobs idénticos cercanos (`/zerith stack`)
+  - ✨ Nuevo: Opción `mob-stacker.auto` para apilar antes de cada limpieza programada
+  - ✨ Nuevo: Permiso `zerithlag.stack`
 
-  ```yaml
-  # Prefijo del plugin (soporta &colores)
-  prefix: "&8[&6ZerithLag&8] &r"
+  ### v1.0.3
+  - 🐛 Fix crítico: `api-version: "1.20"` entre comillas para evitar error *"Unsupported API version 1.2"*
 
-  auto-clear:
-    enabled: true          # Activar limpieza automática
-    interval: 300          # Segundos entre cada limpieza
-    broadcast: true        # Enviar mensajes a todos los jugadores
-    use-action-bar: true   # Mostrar en barra de acción (no en el chat)
-    worlds:
-      - all                # "all" = todos los mundos, o pon el nombre exacto
+  ### v1.0.2
+  - ✨ Alertas en el chat (`chat-alerts`)
+  - ✨ Soporte de colores HEX (`&#RRGGBB`)
+  - ✨ Banner ANSI en consola
 
-    # Segundos restantes en los que se enviará aviso
-    countdown: [60, 30, 10, 5, 3, 2, 1]
-
-    countdown-message: "&eLimpiando entidades en &c{time}s&e..."
-    clear-message: "&aEliminadas &e{amount} &aentidades del mundo."
-
-  entity-types:
-    keep-named: true       # Conservar entidades con nombre personalizado
-    keep-tamed: true       # Conservar animales domesticados
-    remove: []             # Vacío = usa la lista inteligente automática
-
-  messages:
-    reload: "&aConfiguración recargada correctamente."
-    clear-command: "&aEliminadas &e{amount} &aentidades manualmente."
-    no-permission: "&cNo tienes permiso para usar este comando."
-    info: "&6ZerithLag &fv{version} &7por &e{author} &8| &7Total eliminadas: &e{total}"
-  ```
-
-  ### 🎨 Códigos de color
-
-  Usa `&` seguido de un carácter para colorear los mensajes:
-
-  `&0` Negro | `&1` Azul oscuro | `&2` Verde | `&3` Cian | `&4` Rojo  
-  `&5` Morado | `&6` Dorado | `&7` Gris | `&8` Gris oscuro | `&9` Azul  
-  `&a` Verde claro | `&b` Cian claro | `&c` Rojo claro | `&d` Rosa | `&e` Amarillo | `&f` Blanco  
-  `&l` **Negrita** | `&o` *Cursiva* | `&n` Subrayado | `&m` ~~Tachado~~ | `&r` Reset
+  ### v1.0.0 / v1.0.1
+  - 🎉 Release inicial: limpieza automática, TPS monitor, estadísticas
 
   ---
 
-  ## 🧹 Entidades que se eliminan (modo automático)
+  ## 🤝 Créditos
 
-  Cuando `entity-types.remove` está vacío, ZerithLag usa su lista inteligente:
+  Desarrollado con ❤️ por **zerinho23**
 
-  - 📦 Ítems en el suelo (`ITEM`)
-  - ✨ Orbes de experiencia (`EXPERIENCE_ORB`)
-  - 🏹 Flechas y proyectiles (`ARROW`, `SPECTRAL_ARROW`, etc.)
-  - 💣 TNT encendido y bloques en caída
-  - 👾 Todos los mobs hostiles (Zombie, Skeleton, Creeper, **Bogged**, **Breeze** de 1.21...)
-  - 🚤 Botes y vagonetas sin pasajeros
-  - ⚗️ Pociones y objetos lanzados en vuelo
-
-  **Nunca se eliminan:** jugadores, animales domesticados (perros, gatos, caballos con dueño) y entidades con nombre personalizado.
-
-  ---
-
-  ## 🔨 Compilar desde el código fuente
-
-  ```bash
-  git clone https://github.com/Zerinho23/ZerithLag.git
-  cd ZerithLag
-  mvn clean package
-  # El JAR estará en target/ZerithLag-1.0.0.jar
-  ```
-
-  **Requisitos para compilar:** Java 17+, Maven 3.8+
-
-  ---
-
-  ## 📜 Licencia
-
-  Este proyecto es de uso libre para servidores de Minecraft. Créditos a **zerinho23**.
-
-  ---
-
-  <div align="center">
-  Hecho con ❤️ por <strong>zerinho23</strong>
-  </div>
+  [![GitHub](https://img.shields.io/badge/GitHub-Zerinho23-black?style=flat-square&logo=github)](https://github.com/Zerinho23)
   
