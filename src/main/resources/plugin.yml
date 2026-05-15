@@ -1,0 +1,35 @@
+name: ZerithLag
+version: 1.0.0
+main: me.zerith.zerithlag.ZerithLag
+# 1.20 is the minimum; this value is forward-compatible with 1.20.x, 1.21.x and beyond.
+# Paper/Spigot accept plugins targeting an older api-version on newer server builds.
+api-version: 1.20
+description: Plugin antilag para servidores de Minecraft
+author: zerinho23
+
+commands:
+  zerith:
+    description: Comando principal de ZerithLag
+    usage: /<command> [reload|clear|tps|entities|info]
+    permission: zerithlag.use
+    aliases:
+      - zl
+      - zerithlag
+      - antilag
+
+permissions:
+  zerithlag.use:
+    description: Permite usar /zerith
+    default: op
+  zerithlag.reload:
+    description: Permite recargar la configuración
+    default: op
+  zerithlag.clear:
+    description: Permite limpiar entidades manualmente
+    default: op
+  zerithlag.tps:
+    description: Permite ver el TPS del servidor
+    default: op
+  zerithlag.entities:
+    description: Permite ver el reporte de entidades
+    default: op
