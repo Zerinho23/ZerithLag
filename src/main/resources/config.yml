@@ -56,7 +56,6 @@ auto-clear:
     - 1
 
   # Mensaje de la barra de acción. {time} = segundos restantes
-  # Ejemplo con hex: "&#FF6600Limpiando en &l{time}s&#FF6600..."
   countdown-message: "&eLimpiando entidades en &c{time}s&e..."
 
   # Mensaje al terminar la limpieza. {amount} = entidades eliminadas
@@ -81,11 +80,50 @@ chat-alerts:
     - 30
 
   # Mensaje de cuenta regresiva final. {time} = segundos.
-  # Ejemplo con hex: "&#FF4444&lLimpiando en {time}..."
   countdown-message: "&8[&6ZerithLag&8] &r&cLimpiando en &l{time}&c..."
 
   # Desde cuántos segundos antes iniciar la cuenta regresiva en el chat
   countdown-from: 5
+
+# ── Limpieza de emergencia por TPS bajo ───────────
+
+tps-clear:
+
+  # ¿Activar la limpieza automática cuando el TPS es bajo?
+  enabled: true
+
+  # Si el TPS cae por debajo de este valor se activará la limpieza de emergencia
+  # TPS ideal = 20.0  |  Recomendado: 15.0  |  Mínimo útil: 10.0
+  threshold: 15.0
+
+  # Segundos de espera entre limpiezas de emergencia (evita spam durante lag sostenido)
+  cooldown: 60
+
+  # Mensaje al activarse. {tps} = TPS detectado, {amount} = entidades eliminadas.
+  message: "&cTPS bajo &7(&c{tps}&7) &c— limpiando &e{amount} &centidades de emergencia."
+
+# ── Apilado de mobs ────────────────────────────────
+
+mob-stacker:
+
+  # ¿Activar el sistema de apilado?
+  enabled: true
+
+  # Radio en bloques para agrupar mobs del mismo tipo
+  radius: 5.0
+
+  # ¿Ejecutar el apilado automáticamente antes de cada limpieza programada?
+  # Si es true, los mobs se apilan primero y luego se eliminan los restantes.
+  # Si es false, solo se puede usar mediante /zerith stack
+  auto: false
+
+  # Formato del nombre del mob apilado.
+  # {count} = cantidad de mobs en el grupo, {type} = tipo de mob (ej. Zombie)
+  name-format: "&7[&e\u00d7{count}&7] &f{type}"
+
+  # Tipos de mobs a apilar (vacío = solo Monsters automáticamente)
+  # Ejemplos: ZOMBIE, SKELETON, CREEPER, SPIDER, ENDERMAN
+  types: []
 
 # ── Tipos de entidades ─────────────────────────────
 
@@ -112,5 +150,6 @@ entity-types:
 messages:
   reload: "&aConfiguración recargada correctamente."
   clear-command: "&aEliminadas &e{amount} &aentidades manualmente."
+  stack-command: "&aApilados &e{merged} &amobs en &e{merged} &agrupos."
   no-permission: "&cNo tienes permiso para usar este comando."
   info: "&6ZerithLag &fv{version} &7por &e{author} &8| &7Total eliminadas: &e{total}"
