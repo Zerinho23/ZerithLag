@@ -30,8 +30,9 @@ auto-clear:
   # ¿Activar la limpieza automática?
   enabled: true
 
-  # Segundos entre cada limpieza automática (mínimo 10)
-  interval: 300
+  # Tiempo entre cada limpieza automática (mínimo 10s)
+  # Formatos aceptados: 5m | 10m | 1h | 1h30m | 30s | 300 (número = segundos)
+  interval: 5m
 
   # ¿Enviar mensajes a todos los jugadores?
   broadcast: true
@@ -96,8 +97,9 @@ tps-clear:
   # TPS ideal = 20.0  |  Recomendado: 15.0  |  Mínimo útil: 10.0
   threshold: 15.0
 
-  # Segundos de espera entre limpiezas de emergencia (evita spam durante lag sostenido)
-  cooldown: 60
+  # Espera entre limpiezas de emergencia (evita spam durante lag sostenido)
+  # Formatos: 1m | 30s | 2m30s | 90 (número = segundos)
+  cooldown: 1m
 
   # Mensaje al activarse. {tps} = TPS detectado, {amount} = entidades eliminadas.
   message: "&cTPS bajo &7(&c{tps}&7) &c— limpiando &e{amount} &centidades de emergencia."
