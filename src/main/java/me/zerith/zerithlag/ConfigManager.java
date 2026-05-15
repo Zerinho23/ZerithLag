@@ -68,6 +68,41 @@ public class ConfigManager {
         return list.isEmpty() ? List.of("all") : list;
     }
 
+    // ── Chat alerts ──────────────────────────────────────────────────────────
+
+    public boolean isChatAlertsEnabled() {
+        return plugin.getConfig().getBoolean("chat-alerts.enabled", true);
+    }
+
+    /** Message sent when exactly 60 seconds remain. */
+    public String getChatMinuteMessage() {
+        return plugin.getConfig().getString("chat-alerts.minute-message",
+                "&8[&6ZerithLag&8] &r&7La limpieza de entidades ocurrirá en &61 minuto&7.");
+    }
+
+    /** Message sent at the times listed in second-alerts (e.g. 30 s). {time} = seconds. */
+    public String getChatSecondsMessage() {
+        return plugin.getConfig().getString("chat-alerts.seconds-message",
+                "&8[&6ZerithLag&8] &r&7La limpieza de entidades ocurrirá en &e{time} segundos&7.");
+    }
+
+    /** Seconds (other than 60) that trigger the seconds-message. */
+    public List<Integer> getChatSecondAlerts() {
+        List<Integer> list = plugin.getConfig().getIntegerList("chat-alerts.second-alerts");
+        return list.isEmpty() ? List.of(30) : list;
+    }
+
+    /** Countdown message used for the final N seconds. {time} = seconds. */
+    public String getChatCountdownMessage() {
+        return plugin.getConfig().getString("chat-alerts.countdown-message",
+                "&8[&6ZerithLag&8] &r&cLimpiando en &l{time}&c...");
+    }
+
+    /** How many seconds before clearing to start the chat countdown (e.g. 5). */
+    public int getChatCountdownFrom() {
+        return plugin.getConfig().getInt("chat-alerts.countdown-from", 5);
+    }
+
     // ── Entity types ─────────────────────────────────────────────────────────
 
     public List<EntityType> getEntityTypesToRemove() {
@@ -115,12 +150,10 @@ public class ConfigManager {
 
     // ── Util ─────────────────────────────────────────────────────────────────
 
-    /** Parse a raw &-color string into an Adventure Component. */
     public Component component(String text) {
         return LEGACY.deserialize(text);
     }
 
-    /** Returns a legacy-section string for senders that only accept String (e.g. console). */
     public String colorString(String text) {
         return LegacyComponentSerializer.legacySection().serialize(LEGACY.deserialize(text));
     }
