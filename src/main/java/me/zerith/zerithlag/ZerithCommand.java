@@ -13,7 +13,7 @@ public class ZerithCommand implements CommandExecutor, TabCompleter {
 
     private final ZerithLag plugin;
     private static final List<String> SUBCOMMANDS = List.of(
-            "reload", "clear", "info", "tps", "entities"
+            "reload", "clear", "stack", "info", "tps", "entities"
     );
 
     public ZerithCommand(ZerithLag plugin) {
@@ -52,6 +52,25 @@ public class ZerithCommand implements CommandExecutor, TabCompleter {
                         cfg.getMsgClearCommand().replace("{amount}", String.valueOf(cleared)))));
             }
 
+            case "stack" -> {
+                if (!sender.hasPermission("zerithlag.stack")) {
+                    sender.sendMessage(prefix.append(cfg.component(cfg.getMsgNoPermission())));
+                    return true;
+                }
+                if (!cfg.isMobStackerEnabled()) {
+                    sender.sendMessage(prefix.append(cfg.component(
+                            "&cEl mob-stacker está desactivado en la config.")));
+                    return true;
+                }
+                int merged = plugin.getMobStacker().stackAll();
+                // Count remaining stacked groups (entities with × in name) is expensive;
+                // just report merged count directly.
+                String msg = cfg.getMsgStackCommand()
+                        .replace("{merged}", String.valueOf(merged))
+                        .replace("{stacks}", String.valueOf(merged)); // approximate
+                sender.sendMessage(prefix.append(cfg.component(msg)));
+            }
+
             case "info" -> {
                 StatsManager stats   = plugin.getStatsManager();
                 String       version = plugin.getPluginMeta().getVersion();
@@ -63,6 +82,11 @@ public class ZerithCommand implements CommandExecutor, TabCompleter {
                 sender.sendMessage(cfg.component("  &7Última limpieza: &e"
                         + stats.getLastClearTimeFormatted()
                         + " &7(&e" + stats.getLastClearAmount() + " &7entidades)"));
+                double tps = plugin.getTpsMonitor().getTps();
+                sender.sendMessage(cfg.component("  &7TPS actual: "
+                        + plugin.getTpsMonitor().getTpsColored()
+                        + (tps < plugin.getConfigManager().getTpsClearThreshold()
+                           ? " &c⚠ Por debajo del umbral de emergencia" : "")));
             }
 
             case "tps" -> {
@@ -137,6 +161,7 @@ public class ZerithCommand implements CommandExecutor, TabCompleter {
                 + " &8| &7by &e" + ZerithLag.AUTHOR));
         sender.sendMessage(cfg.component("  &e/zerith reload    &8» &7Recargar config"));
         sender.sendMessage(cfg.component("  &e/zerith clear     &8» &7Limpiar entidades ahora"));
+        sender.sendMessage(cfg.component("  &e/zerith stack     &8» &7Apilar mobs cercanos"));
         sender.sendMessage(cfg.component("  &e/zerith entities  &8» &7Ver entidades [mundo]"));
         sender.sendMessage(cfg.component("  &e/zerith tps       &8» &7Ver TPS del servidor"));
         sender.sendMessage(cfg.component("  &e/zerith info      &8» &7Info y estadísticas"));
