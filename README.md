@@ -101,6 +101,8 @@
 
   **Variables del nombre:** `{count}` = cantidad · `{type}` = nombre del mob
 
+> Por defecto apila en **todos los mundos** (Overworld, Nether, End). Configurable con `mob-stacker.worlds`.
+
   ---
 
   ## 💬 Alertas en el chat
@@ -116,6 +118,23 @@
     countdown-message: "&8[&6ZerithLag&8] &r&cLimpiando en &l{time}&c..."
     countdown-from: 5     # desde cuántos segundos iniciar la cuenta regresiva
   ```
+
+  ---
+
+  
+  ## 🗺️ Pre-cargador de chunks
+
+  Al arrancar el servidor, ZerithLag pre-carga los chunks alrededor del spawn de cada mundo de forma **asíncrona y en lotes pequeños**, sin causar lag. Así los jugadores no sufren lag de generación de terreno al entrar al mundo.
+
+  ```yaml
+  chunk-preloader:
+    enabled: true
+    radius: 10     # chunks alrededor del spawn (10 = área 21×21 chunks)
+    worlds:
+      - all        # "all" o nombres específicos: [world, world_nether, world_the_end]
+  ```
+
+  El pre-cargador también se re-ejecuta al usar `/zerith reload`.
 
   ---
 
@@ -176,6 +195,11 @@
   ---
 
   ## 📋 Changelog
+
+  ### v1.2.0
+  - ✨ Nuevo: Mob Stacker ahora opera en **todos los mundos** por defecto (Overworld, Nether, End)
+  - ✨ Nuevo: `mob-stacker.worlds` — controla en qué mundos aplica el stacker
+  - ✨ Nuevo: Pre-cargador de chunks (`chunk-preloader`) — calienta el spawn de cada mundo al arrancar
 
   ### v1.1.1
   - ✨ Nuevo: Formato de tiempo legible en config (`5m`, `1h`, `30s`, `1h30m`, etc.) para `interval` y `cooldown`
