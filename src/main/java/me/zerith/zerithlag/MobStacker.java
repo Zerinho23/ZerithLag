@@ -50,7 +50,7 @@ public class MobStacker {
     // ── Internal ─────────────────────────────────────────────────────────────
 
     private int stackWorld(World world, ConfigManager cfg) {
-        List<String> worlds   = cfg.getWorldsToClear();
+        List<String> worlds    = cfg.getMobStackerWorlds();
         boolean      allWorlds = worlds.contains("all");
         if (!allWorlds && !worlds.contains(world.getName())) return 0;
 
