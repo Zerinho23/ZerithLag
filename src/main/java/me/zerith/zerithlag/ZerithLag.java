@@ -17,12 +17,13 @@ public class ZerithLag extends JavaPlugin {
     private static final String ANSI_CYAN   = "\u001B[38;2;85;255;255m";
 
     private static ZerithLag instance;
-    private ConfigManager  configManager;
-    private StatsManager   statsManager;
-    private TpsMonitor     tpsMonitor;
-    private TpsClearTask   tpsClearTask;
-    private ClearTask      clearTask;
-    private MobStacker     mobStacker;
+    private ConfigManager   configManager;
+    private StatsManager    statsManager;
+    private TpsMonitor      tpsMonitor;
+    private TpsClearTask    tpsClearTask;
+    private ClearTask       clearTask;
+    private MobStacker      mobStacker;
+    private ChunkPreloader  chunkPreloader;
 
     @Override
     public void onEnable() {
@@ -31,11 +32,12 @@ public class ZerithLag extends JavaPlugin {
         configManager = new ConfigManager(this);
         configManager.loadConfig();
 
-        statsManager = new StatsManager();
-        tpsMonitor   = new TpsMonitor(this);
+        statsManager   = new StatsManager();
+        tpsMonitor     = new TpsMonitor(this);
         tpsMonitor.start();
 
-        mobStacker = new MobStacker(this);
+        mobStacker     = new MobStacker(this);
+        chunkPreloader = new ChunkPreloader(this);
 
         ZerithCommand cmd = new ZerithCommand(this);
         getCommand("zerith").setExecutor(cmd);
@@ -43,6 +45,7 @@ public class ZerithLag extends JavaPlugin {
 
         startClearTask();
         startTpsClearTask();
+        chunkPreloader.start();
         printBanner();
     }
 
@@ -83,6 +86,9 @@ public class ZerithLag extends JavaPlugin {
         configManager.loadConfig();
         startClearTask();
         startTpsClearTask();
+        // Re-run chunk preloader on reload so new worlds/radius take effect
+        chunkPreloader = new ChunkPreloader(this);
+        chunkPreloader.start();
         getLogger().info(ANSI_GREEN + "Configuración recargada correctamente." + ANSI_RESET);
     }
 
@@ -122,9 +128,10 @@ public class ZerithLag extends JavaPlugin {
         getLogger().info("");
     }
 
-    public static ZerithLag getInstance()     { return instance; }
-    public ConfigManager  getConfigManager()  { return configManager; }
-    public StatsManager   getStatsManager()   { return statsManager; }
-    public TpsMonitor     getTpsMonitor()     { return tpsMonitor; }
-    public MobStacker     getMobStacker()     { return mobStacker; }
+    public static ZerithLag getInstance()      { return instance; }
+    public ConfigManager   getConfigManager()  { return configManager; }
+    public StatsManager    getStatsManager()   { return statsManager; }
+    public TpsMonitor      getTpsMonitor()     { return tpsMonitor; }
+    public MobStacker      getMobStacker()     { return mobStacker; }
+    public ChunkPreloader  getChunkPreloader() { return chunkPreloader; }
 }
