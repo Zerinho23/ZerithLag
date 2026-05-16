@@ -119,13 +119,38 @@ mob-stacker:
   # Si es false, solo se puede usar mediante /zerith stack
   auto: false
 
+  # Mundos donde apilar mobs
+  # "all" = todos los mundos (Overworld, Nether, End y cualquier mundo extra)
+  # O lista de nombres exactos: [world, world_nether, world_the_end]
+  worlds:
+    - all
+
   # Formato del nombre del mob apilado.
   # {count} = cantidad de mobs en el grupo, {type} = tipo de mob (ej. Zombie)
   name-format: "&7[&e\u00d7{count}&7] &f{type}"
 
   # Tipos de mobs a apilar (vacío = solo Monsters automáticamente)
-  # Ejemplos: ZOMBIE, SKELETON, CREEPER, SPIDER, ENDERMAN
+  # Ejemplos: ZOMBIE, SKELETON, CREEPER, SPIDER, ENDERMAN, BLAZE, WITHER_SKELETON
   types: []
+
+# ── Pre-cargador de chunks ─────────────────────────
+
+chunk-preloader:
+
+  # Pre-carga los chunks alrededor del spawn de cada mundo al arrancar el servidor.
+  # Esto evita que los jugadores sufran lag al entrar al mundo por primera vez.
+  enabled: true
+
+  # Radio en chunks alrededor del spawn a pre-cargar.
+  # 10 = área de 21×21 chunks (336×336 bloques) alrededor del spawn.
+  # Aumentar este valor carga más terreno pero tarda más al iniciar.
+  radius: 10
+
+  # Mundos a pre-cargar
+  # "all" = todos (Overworld, Nether, End y mundos extras)
+  # O lista de nombres: [world, world_nether, world_the_end]
+  worlds:
+    - all
 
 # ── Tipos de entidades ─────────────────────────────
 
