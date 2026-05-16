@@ -150,6 +150,21 @@ public class ConfigManager {
         return plugin.getConfig().getBoolean("entity-types.keep-tamed", true);
     }
 
+    // ── Chunk preloader ───────────────────────────────────────────────────────
+
+    public boolean isChunkPreloaderEnabled() {
+        return plugin.getConfig().getBoolean("chunk-preloader.enabled", true);
+    }
+
+    public int getChunkPreloaderRadius() {
+        return Math.max(1, plugin.getConfig().getInt("chunk-preloader.radius", 10));
+    }
+
+    public List<String> getChunkPreloaderWorlds() {
+        List<String> list = plugin.getConfig().getStringList("chunk-preloader.worlds");
+        return list.isEmpty() ? List.of("all") : list;
+    }
+
     // ── TPS-triggered clear ───────────────────────────────────────────────────
 
     public boolean isTpsClearEnabled() {
@@ -182,6 +197,11 @@ public class ConfigManager {
 
     public boolean isMobStackerAutoEnabled() {
         return plugin.getConfig().getBoolean("mob-stacker.auto", false);
+    }
+
+    public List<String> getMobStackerWorlds() {
+        List<String> list = plugin.getConfig().getStringList("mob-stacker.worlds");
+        return list.isEmpty() ? List.of("all") : list;
     }
 
     public String getMobStackerNameFormat() {
